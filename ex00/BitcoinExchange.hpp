@@ -23,6 +23,7 @@ class BitcoinExchange
     
     private:
         void _loadInputData(const std::string &filename, const std::string &dbFilename);
+        void _loadDBData(const std::string &filename, const std::string &dbFilename);
 
         std::map<std::string, double> _data;
 

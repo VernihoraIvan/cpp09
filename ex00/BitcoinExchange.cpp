@@ -26,7 +26,7 @@ BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other)
 }
 
 
-void BitcoinExchange::_loadInputData(const std::string &filename, const std::string &dbFilename)
+void BitcoinExchange::_loadDBData(const std::string &filename, const std::string &dbFilename)
 {
     std::ifstream dbFile(dbFilename.c_str());
     std::ifstream inputFile(filename.c_str());
@@ -50,16 +50,20 @@ void BitcoinExchange::_loadInputData(const std::string &filename, const std::str
             continue;
         std::string date = trim(line.substr(0, line.find(",")));
         std::string value = trim(line.substr(line.find(",") + 1));
-        // std::cout << date << " | " << value << std::endl;
 
         if (isDateValid(date))
         {
             std::cerr << "Error: invalid date " << date << std::endl;
             continue;
         }
+
+        if (isValueValid(value))
+        {
+            std::cerr << "Error: invalid value " << value << std::endl;
+            continue;
+        }
        
         _data[date] = std::stod(value);
-        // std::cout << _data[date] << std::endl;
         
     }
 }

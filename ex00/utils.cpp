@@ -38,3 +38,10 @@ int isDateValid(const std::string& date) {
 
     return ss.fail();
 }
+
+int isValueValid(const std::string& value)
+{
+    if (value.find_first_not_of("0123456789.") != std::string::npos)
+        return 1;
+    return 0;
+}
