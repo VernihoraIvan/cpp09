@@ -5,9 +5,10 @@ BitcoinExchange::BitcoinExchange(void)
 {
 }
 
-BitcoinExchange::BitcoinExchange(std::string filename, std::string dbFilename)
+BitcoinExchange::BitcoinExchange(std::string inputFilename, std::string dbFilename)
 {
-    _loadInputData(filename, dbFilename);
+    _loadDBData(inputFilename, dbFilename);
+    _parseInputData(inputFilename);
 }
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange &other)
@@ -25,20 +26,50 @@ BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other)
     return *this;
 }
 
+void BitcoinExchange::_parseInputData(const std::string &inputFilename)
+{
+    std::ifstream inputFile(inputFilename.c_str());
+    std::string line;
+    while(std::getline(inputFile, line))
+    {
+        if (line == "date | value")
+            continue;
+        std::string date = trim(line.substr(0, line.find("|")));
+        std::string value = trim(line.substr(line.find("|") + 1));
 
-void BitcoinExchange::_loadDBData(const std::string &filename, const std::string &dbFilename)
+        // std::cout << "date: " << date << " value: " << value << std::endl;
+        if (isDateInvalid(date))
+        {
+            std::cerr << "Error: invalid date " << date << " in input file " << inputFilename << std::endl;
+            continue;
+        }
+        if (value.empty() || isValueInvalid(value))
+        {
+
+            std::cerr << "Error: invalid value " << value << " in input file " << inputFilename << std::endl;
+            continue;
+        }
+
+        _outputData[date] = std::stod(value) * _data[date];
+        // std::cout << date << " | " << _outputData[date] << std::endl;
+    }
+}
+
+
+
+void BitcoinExchange::_loadDBData(const std::string &inputFilename, const std::string &dbFilename)
 {
     std::ifstream dbFile(dbFilename.c_str());
-    std::ifstream inputFile(filename.c_str());
+    std::ifstream inputFile(inputFilename.c_str());
 
     if (!inputFile.is_open())
     {
-        std::cerr << "Error: could not open inputFile " << dbFilename << std::endl;
+        std::cerr << "Error: could not open inputFile " << inputFilename << std::endl;
         return;
     }
     if (!dbFile.is_open())
     {
-        std::cerr << "Error: could not open dbFile " << filename << std::endl;
+        std::cerr << "Error: could not open dbFile " << dbFilename << std::endl;
         return;
     }
 
@@ -51,13 +82,13 @@ void BitcoinExchange::_loadDBData(const std::string &filename, const std::string
         std::string date = trim(line.substr(0, line.find(",")));
         std::string value = trim(line.substr(line.find(",") + 1));
 
-        if (isDateValid(date))
+        if (isDateInvalid(date))
         {
             std::cerr << "Error: invalid date " << date << std::endl;
             continue;
         }
 
-        if (isValueValid(value))
+        if (isValueInvalid(value))
         {
             std::cerr << "Error: invalid value " << value << std::endl;
             continue;

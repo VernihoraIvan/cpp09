@@ -4,8 +4,8 @@
 #include <string>
 
 std::string trim(const std::string& str);
-int isDateValid(const std::string& date);
-int isValueValid(const std::string& value);
+int isDateInvalid(const std::string& date);
+int isValueInvalid(const std::string& value);
 
 
 #endif

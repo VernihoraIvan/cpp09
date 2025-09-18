@@ -10,7 +10,8 @@ std::string trim(const std::string& str) {
     return str.substr(first, (last - first + 1));
 }
 
-int isDateValid(const std::string& date) {
+int isDateInvalid(const std::string& date) {
+
     if (date.find_first_not_of("0123456789-") != std::string::npos)
         return 1;
 
@@ -26,7 +27,14 @@ int isDateValid(const std::string& date) {
     timeinfo.tm_hour = 0;
     timeinfo.tm_min = 0;
     timeinfo.tm_sec = 0;
-    timeinfo.tm_isdst = -1;          
+    timeinfo.tm_isdst = -1;
+    
+    if (timeinfo.tm_mon < 0 || timeinfo.tm_mon > 11)
+        return 1;
+    if (timeinfo.tm_mday < 1 || timeinfo.tm_mday > 31)
+        return 1;
+    if (timeinfo.tm_year < 0)
+        return 1;
     
     time_t timestamp = mktime(&timeinfo);
 
@@ -39,7 +47,7 @@ int isDateValid(const std::string& date) {
     return ss.fail();
 }
 
-int isValueValid(const std::string& value)
+int isValueInvalid(const std::string& value)
 {
     if (value.find_first_not_of("0123456789.") != std::string::npos)
         return 1;

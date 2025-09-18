@@ -22,10 +22,12 @@ class BitcoinExchange
         BitcoinExchange(std::string filename, std::string dbFilename);
     
     private:
-        void _loadInputData(const std::string &filename, const std::string &dbFilename);
+        void _parseInputData(const std::string &inputFilename);
         void _loadDBData(const std::string &filename, const std::string &dbFilename);
+        
 
         std::map<std::string, double> _data;
+        std::map<std::string, double> _outputData;
 
         
 };
