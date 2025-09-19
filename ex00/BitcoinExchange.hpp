@@ -12,6 +12,9 @@
 #include <cctype>
 #include <cmath>
 
+#define RED "\033[31m"
+#define RESET "\033[0m"
+
 class BitcoinExchange
 {
     public:

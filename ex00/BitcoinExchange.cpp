@@ -3,7 +3,7 @@
 
 BitcoinExchange::BitcoinExchange(void)
 {
-    std::cerr << "Error: provide input and db filenames" << std::endl;
+    std::cerr << RED << "Error: provide input and db filenames" << RESET << std::endl;
 }
 
 BitcoinExchange::BitcoinExchange(std::string inputFilename, std::string dbFilename)
@@ -39,7 +39,7 @@ double BitcoinExchange::_findClosestRate(const std::string &date)
 
     if (it == _data.begin())
     {
-        std::cerr << "Error: no exchange rate available for date " << date << " or earlier" << std::endl;
+        std::cerr << RED << "Error: no exchange rate available for date " << date << " or earlier" << RESET << std::endl;
         return -1;
     }
 
@@ -54,7 +54,7 @@ void BitcoinExchange::_parseInputData(const std::string &inputFilename)
 
     if (!inputFile.is_open())
     {
-        std::cerr << "Error: could not open inputFile " << inputFilename << std::endl;
+        std::cerr << RED << "Error: could not open inputFile " << inputFilename << RESET << std::endl;
         return;
     }
 
@@ -66,7 +66,7 @@ void BitcoinExchange::_parseInputData(const std::string &inputFilename)
         size_t delimeterPos = line.find("|");
         if (delimeterPos == std::string::npos)
         {
-            std::cerr << "Error: invalid format in line: " << line << std::endl;
+            std::cerr << RED << "Error: invalid format in line: " << line << RESET << std::endl;
             continue;
         }
 
@@ -75,13 +75,13 @@ void BitcoinExchange::_parseInputData(const std::string &inputFilename)
 
         if (isDateInvalid(date))
         {
-            std::cerr << "Error: invalid date " << date << " in input file " << inputFilename << std::endl;
+            std::cerr << RED << "Error: invalid date " << date << " in input file " << inputFilename << RESET << std::endl;
             continue;
         }
         if (value.empty() || isValueInvalid(value, true))
         {
 
-            std::cerr << "Error: invalid value " << value << " in input file " << inputFilename << std::endl;
+            std::cerr << RED << "Error: invalid value " << value << " in input file " << inputFilename << RESET << std::endl;
             continue;
         }
 
@@ -101,7 +101,7 @@ void BitcoinExchange::_loadDBData(const std::string &dbFilename)
 
     if (!dbFile.is_open())
     {
-        std::cerr << "Error: could not open dbFile " << dbFilename << std::endl;
+        std::cerr << RED << "Error: could not open dbFile " << dbFilename << RESET << std::endl;
         return;
     }
 
@@ -115,7 +115,7 @@ void BitcoinExchange::_loadDBData(const std::string &dbFilename)
         size_t delimeterPos = line.find(",");
         if (delimeterPos == std::string::npos)
         {
-            std::cerr << "Error: invalid format in line: " << line << std::endl;
+            std::cerr << RED << "Error: invalid format in line: " << line << RESET << std::endl;
             continue;
         }
 
@@ -124,13 +124,13 @@ void BitcoinExchange::_loadDBData(const std::string &dbFilename)
 
         if (isDateInvalid(date))
         {
-            std::cerr << "Error: invalid date " << date << std::endl;
+            std::cerr << RED << "Error: invalid date " << date << RESET << std::endl;
             continue;
         }
 
         if (isValueInvalid(value))
         {
-            std::cerr << "Error: invalid value " << value << std::endl;
+            std::cerr << RED << "Error: invalid value " << value << RESET << std::endl;
             continue;
         }
 

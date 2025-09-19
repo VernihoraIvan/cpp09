@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        std::cerr << "Error: wrong amount of arguements" << std::endl;
+        std::cerr << RED << "Error: wrong amount of arguements" << RESET << std::endl;
         return 1;
     }
 
