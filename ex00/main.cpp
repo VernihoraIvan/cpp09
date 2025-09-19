@@ -12,6 +12,5 @@ int main(int argc, char** argv)
 
     std::string filename(argv[1]);
     BitcoinExchange btc(filename, "assets/data.csv");
-    // btc.loadData(argv[1]);
     return 0;
 }

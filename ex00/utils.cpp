@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <sstream>
 #include <iostream>
+#include <ctime>
 
 std::string trim(const std::string& str) {
     size_t first = str.find_first_not_of(" \t\n\r");
@@ -49,9 +50,9 @@ int isDateInvalid(const std::string& date) {
 
 int isValueInvalid(const std::string& value, bool isInput = false)
 {
-    if (isInput && (std::stod(value) < 0 || std::stod(value) > 1000))
-        return 1;
     if (value.find_first_not_of("0123456789.") != std::string::npos)
+        return 1;
+    if (isInput && (std::stod(value) < 0 || std::stod(value) > 1000))
         return 1;
     return 0;
 }
