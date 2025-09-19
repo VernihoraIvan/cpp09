@@ -9,7 +9,6 @@ BitcoinExchange::BitcoinExchange(std::string inputFilename, std::string dbFilena
 {
     _loadDBData(inputFilename, dbFilename);
     _parseInputData(inputFilename);
-    _printOutputData();
 }
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange &other)
@@ -55,13 +54,12 @@ void BitcoinExchange::_parseInputData(const std::string &inputFilename)
         std::string date = trim(line.substr(0, line.find("|")));
         std::string value = trim(line.substr(line.find("|") + 1));
 
-        // std::cout << "date: " << date << " value: " << value << std::endl;
         if (isDateInvalid(date))
         {
             std::cerr << "Error: invalid date " << date << " in input file " << inputFilename << std::endl;
             continue;
         }
-        if (value.empty() || isValueInvalid(value))
+        if (value.empty() || isValueInvalid(value, true))
         {
 
             std::cerr << "Error: invalid value " << value << " in input file " << inputFilename << std::endl;
@@ -70,28 +68,13 @@ void BitcoinExchange::_parseInputData(const std::string &inputFilename)
 
         double rate = _findClosestRate(date);
 
-        // std::cout << "rate: " << rate << std::endl;
         if (rate == 0.0)
-        continue;
+            continue;
         
-        // std::cout << value << " * " << rate << " = " << std::stod(value) * rate << std::endl;
         _outputData[date] = std::stod(value) * rate;
-        for (std::map<std::string, double>::iterator it = _outputData.begin(); it != _outputData.end(); it++)
-        {
-            std::cout << it->first << " => " << std::stod(value) << " = " << it->second << std::endl;
-        }
+            std::cout << date << " => " << std::stod(value) << " = " << _outputData[date] << std::endl;
     }
 }
-
-void BitcoinExchange::_printOutputData(void)
-{
-
-    // for (std::map<std::string, double>::iterator it = _outputData.begin(); it != _outputData.end(); it++)
-    // {
-    //     std::cout << it->first << " => " << it->second << std::endl;
-    // }
-}
-
 
 void BitcoinExchange::_loadDBData(const std::string &inputFilename, const std::string &dbFilename)
 {

@@ -24,7 +24,6 @@ class BitcoinExchange
     private:
         void _parseInputData(const std::string &inputFilename);
         void _loadDBData(const std::string &filename, const std::string &dbFilename);
-        void _printOutputData(void);
         double _findClosestRate(const std::string &date);
 
         std::map<std::string, double> _data;

@@ -47,8 +47,10 @@ int isDateInvalid(const std::string& date) {
     return ss.fail();
 }
 
-int isValueInvalid(const std::string& value)
+int isValueInvalid(const std::string& value, bool isInput = false)
 {
+    if (isInput && (std::stod(value) < 0 || std::stod(value) > 1000))
+        return 1;
     if (value.find_first_not_of("0123456789.") != std::string::npos)
         return 1;
     return 0;
