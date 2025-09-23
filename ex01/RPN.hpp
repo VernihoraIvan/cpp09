@@ -8,7 +8,6 @@ class RPN {
     static void process(const std::string& expression);
 
    private:
-    // Private constructor and destructor to prevent instantiation
     RPN();
     RPN(const RPN& other);
     RPN& operator=(const RPN& other);
