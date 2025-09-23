@@ -35,7 +35,7 @@ double BitcoinExchange::_findClosestRate(const std::string &date)
     if (_data.find(date) != _data.end())
         return _data[date];
 
-    std::map<std::string, double>::iterator it = _data.upper_bound(date);
+    std::map<std::string, double>::iterator it = _data.lower_bound(date);
 
     if (it == _data.begin())
     {

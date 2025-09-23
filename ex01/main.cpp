@@ -1,6 +1,9 @@
 #include <string>
 #include <iostream>
-#include "BitcoinExchange.hpp"
+#include "RPN.hpp"
+
+#define RED "\033[31m"
+#define RESET "\033[0m"
 
 int main(int argc, char** argv)
 {
@@ -13,7 +16,7 @@ int main(int argc, char** argv)
     std::string filename(argv[1]);
     try
     {
-        BitcoinExchange btc(filename, "assets/data.csv");
+        RPN::process(filename);
     }
     catch (const std::exception &e)
     {
