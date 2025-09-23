@@ -1,27 +1,30 @@
 #include <string>
 #include <iostream>
-#include "RPN.hpp"
+#include "PmergeMe.hpp"
 
 #define RED "\033[31m"
 #define RESET "\033[0m"
 
 int main(int argc, char** argv)
 {
-    if (argc != 2)
+    if (argc < 2)
     {
         std::cerr << RED << "Error: wrong amount of arguements" << RESET << std::endl;
-        std::cerr << "Usage: ./RPN <expression>" << std::endl;
+        std::cerr << "Usage: ./PmergeMe <sequence>" << std::endl;
         return 1;
     }
+    PmergeMe pmergeMe;
 
-    std::string filename(argv[1]);
     try
     {
-        RPN::process(filename);
+        pmergeMe.parseAndStore(argc, argv);
+        pmergeMe.executeSort();
+        pmergeMe.printResults();
     }
-    catch (const std::exception &e)
+    catch(const std::exception& e)
     {
         std::cerr << RED << e.what() << RESET << std::endl;
     }
+    
     return 0;
 }
