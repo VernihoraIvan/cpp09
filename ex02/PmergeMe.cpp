@@ -1,6 +1,9 @@
 #include "PmergeMe.hpp"
 #include <climits>
 
+#define BLUE "\033[34m"
+#define RESET "\033[0m"
+
 // Default constructor
 PmergeMe::PmergeMe() : _vecTime(0.0), _listTime(0.0) {}
 
@@ -104,14 +107,58 @@ void PmergeMe::printResults()
 			  << " us" << std::endl;
 }
 
+void PmergeMe::initialPairing(std::vector<std::pair<int, int> > &pairs)
+{
+    for (size_t i = 0; i < _vec.size(); i += 2)
+    {
+        if (i + 1 < _vec.size())
+            pairs.push_back(std::make_pair(_vec[i], _vec[i + 1]));
+        else
+            pairs.push_back(std::make_pair(_vec[i], 0));
+    }
+    for (size_t i = 0; i < pairs.size(); i++)
+    {
+        std::cout << BLUE << "pair[" << i << "]: " << pairs[i].first << " " << pairs[i].second << RESET << std::endl;
+    }
+}
+
+void PmergeMe::initialSort(std::vector<std::pair<int, int> > &pairs)
+{
+    std::cout << "initialSort" << std::endl;
+    std::cout << "pairs[1]: " << pairs[1].first << " " << pairs[1].second << std::endl;
+    for (size_t i = 0; i < pairs.size(); i++)
+    {
+        if (pairs[i].first > pairs[i].second)
+            std::swap(pairs[i].first, pairs[i].second);
+    }
+    std::cout << "after swap" << std::endl;
+    for (size_t i = 0; i < pairs.size(); i++)
+    {
+        std::cout << BLUE << "pair[" << i << "]: " << pairs[i].first << " " << pairs[i].second << RESET << std::endl;
+    }
+}
+
+
+
 // Stubs for the sorting methods
 void PmergeMe::sortVector()
 {
+    std::vector<std::pair<int, int> > pairs;
+    std::vector<int> mainChain;
+    std::vector<int> pendulumChain;
+
     if (_vec.empty())
         throw std::runtime_error("Error: No input numbers provided.");
     if (_vec.size() == 1)
         return;
-    // mergeInsertSort(_vec);
+    
+    initialPairing(pairs);
+    initialSort(pairs);
+    for (size_t i = 0; i < pairs.size(); i++)
+    {
+        mainChain.push_back(pairs[i].first);
+        pendulumChain.push_back(pairs[i].second);
+    }
 	
 }
 
