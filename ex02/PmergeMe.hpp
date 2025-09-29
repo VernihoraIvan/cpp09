@@ -24,9 +24,10 @@ private:
 	PmergeMe &operator=(const PmergeMe &other);
 
 	// Private methods for vector
-    void initialPairing(std::vector<std::pair<int, int> > &pairs);
+    void initialPairing(const std::vector<int> &vec, std::vector<std::pair<int, int> > &pairs);
 	void sortVector();
 	void initialSort(std::vector<std::pair<int, int> > &pairs);
+	void mergeInsertSort(std::vector<int> &vec);
 	// ... any other helper functions for vector ...
 
 	// Private methods for list

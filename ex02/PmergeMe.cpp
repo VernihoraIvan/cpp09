@@ -2,15 +2,15 @@
 #include <climits>
 
 #define BLUE "\033[34m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
 #define RESET "\033[0m"
+#define DEBUG true
 
-// Default constructor
 PmergeMe::PmergeMe() : _vecTime(0.0), _listTime(0.0) {}
 
-// Destructor
 PmergeMe::~PmergeMe() {}
 
-// Copy constructor and assignment operator (private to prevent copying)
 PmergeMe::PmergeMe(const PmergeMe &other)
 {
 	*this = other;
@@ -40,7 +40,10 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 
 void printVector(const std::vector<int> &vec)
 {
-	std::cout << "Before: ";
+    if (DEBUG)
+        std::cout << BLUE << "Before: " << RESET;
+    else
+        std::cout << "Before: ";
 	for (size_t i = 0; i < vec.size(); ++i)
 		std::cout << vec[i] << " ";
 	std::cout << std::endl;
@@ -53,7 +56,7 @@ void printList(const std::list<int> &list)
 		std::cout << *it << " ";
 	std::cout << std::endl;
 }
-// Method to parse and store the input sequence
+
 void PmergeMe::parseAndStore(int argc, char **argv)
 {
 	for (int i = 1; i < argc; ++i)
@@ -76,7 +79,6 @@ void PmergeMe::parseAndStore(int argc, char **argv)
 		throw std::runtime_error("Error: No input numbers provided.");
 }
 
-// Method to execute the sorting process for both containers
 void PmergeMe::executeSort()
 {
     clock_t start = clock();
@@ -90,7 +92,6 @@ void PmergeMe::executeSort()
     setListTime(static_cast<double>(listEnd - startList) / CLOCKS_PER_SEC * 1000000);
 }
 
-// Method to print the results
 void PmergeMe::printResults()
 {
 	std::cout << "After:  ";
@@ -107,62 +108,129 @@ void PmergeMe::printResults()
 			  << " us" << std::endl;
 }
 
-void PmergeMe::initialPairing(std::vector<std::pair<int, int> > &pairs)
+void PmergeMe::initialPairing(const std::vector<int> &vec, std::vector<std::pair<int, int> > &pairs)
 {
-    for (size_t i = 0; i < _vec.size(); i += 2)
+    for (size_t i = 0; i < vec.size(); i += 2)
     {
-        if (i + 1 < _vec.size())
-            pairs.push_back(std::make_pair(_vec[i], _vec[i + 1]));
+        if (i + 1 < vec.size())
+            pairs.push_back(std::make_pair(vec[i], vec[i + 1]));
         else
-            pairs.push_back(std::make_pair(_vec[i], 0));
+            pairs.push_back(std::make_pair(vec[i], 0));
     }
-    for (size_t i = 0; i < pairs.size(); i++)
-    {
-        std::cout << BLUE << "pair[" << i << "]: " << pairs[i].first << " " << pairs[i].second << RESET << std::endl;
-    }
+    // for (size_t i = 0; i < pairs.size(); i++)
+    // {
+    //     std::cout << BLUE << "pair[" << i << "]: " << pairs[i].first << " " << pairs[i].second << RESET << std::endl;
+    // }
 }
 
 void PmergeMe::initialSort(std::vector<std::pair<int, int> > &pairs)
 {
-    std::cout << "initialSort" << std::endl;
-    std::cout << "pairs[1]: " << pairs[1].first << " " << pairs[1].second << std::endl;
     for (size_t i = 0; i < pairs.size(); i++)
     {
         if (pairs[i].first > pairs[i].second)
             std::swap(pairs[i].first, pairs[i].second);
     }
-    std::cout << "after swap" << std::endl;
-    for (size_t i = 0; i < pairs.size(); i++)
+    // for (size_t i = 0; i < pairs.size(); i++)
+    // {
+    //     std::cout << BLUE << "pair[" << i << "]: " << pairs[i].first << " " << pairs[i].second << RESET << std::endl;
+    // }
+}
+
+void PmergeMe::mergeInsertSort(std::vector<int> &vec)
+{
+	if (vec.size() <= 1)
+		return;
+
+	// 1. Handle the stray element if the sequence size is odd.
+	int stray = -1;
+	if (vec.size() % 2 != 0)
+	{
+		stray = vec.back();
+		vec.pop_back();
+	}
+
+	// 2. Pair up elements and sort them internally to (larger, smaller).
+	std::vector<std::pair<int, int> > pairs;
+	for (size_t i = 0; i < vec.size(); i += 2)
+	{
+		if (vec[i] > vec[i + 1])
+			pairs.push_back(std::make_pair(vec[i], vec[i + 1]));
+		else
+			pairs.push_back(std::make_pair(vec[i + 1], vec[i]));
+	}
+
+	// 3. Create the main chain (larger elements) and pendulum chain (smaller elements).
+	std::vector<int> mainChain;
+	std::vector<int> pendChain;
+	for (size_t i = 0; i < pairs.size(); i++)
+	{
+		mainChain.push_back(pairs[i].first);
+        if (DEBUG)
+            std::cout << GREEN << "mainChain.push_back(" << pairs[i].first << ")" << RESET << std::endl;
+		pendChain.push_back(pairs[i].second);
+        if (DEBUG)
+            std::cout << GREEN << "pendChain.push_back(" << pairs[i].second << ")" << RESET << std::endl;
+	}
+
+	// 4. Recursively sort the main chain.
+	mergeInsertSort(mainChain);
+
+	// 5. INSERTION PHASE: Insert pendulum elements into the sorted main chain.
+	// First, insert the element paired with the smallest element of the main chain.
+	mainChain.insert(mainChain.begin(), pendChain[0]);
+
+	// Generate Jacobsthal numbers to determine the optimal insertion order.
+	std::vector<int> jacob_indices;
+	int j_prev = 1, j_curr = 3;
+	while (j_prev < (int)pendChain.size()) {
+		jacob_indices.push_back(std::min((int)pendChain.size(), j_curr));
+		int temp = j_curr;
+		j_curr = j_curr + 2 * j_prev;
+		j_prev = temp;
+	}
+
+	// Insert elements in groups based on the Jacobsthal sequence, working backwards.
+	int last_inserted_idx = 1;
+	for (size_t i = 0; i < jacob_indices.size(); ++i)
+	{
+		int group_end = jacob_indices[i];
+		for (int j = group_end; j > last_inserted_idx; --j)
+		{
+			int val = pendChain[j - 1];
+			// Use std::lower_bound for efficient binary search insertion.
+			std::vector<int>::iterator insertion_point = std::lower_bound(mainChain.begin(), mainChain.end(), val);
+			mainChain.insert(insertion_point, val);
+		}
+		last_inserted_idx = group_end;
+	}
+
+	// 6. Insert the stray element if it exists.
+	if (stray != -1)
+	{
+		std::vector<int>::iterator insertion_point = std::lower_bound(mainChain.begin(), mainChain.end(), stray);
+		mainChain.insert(insertion_point, stray);
+	}
+
+	// 7. The final sorted sequence is now in mainChain, so copy it back.
+	vec = mainChain;
+    if (DEBUG)
     {
-        std::cout << BLUE << "pair[" << i << "]: " << pairs[i].first << " " << pairs[i].second << RESET << std::endl;
+        std::cout << GREEN << "vec = mainChain" << RESET << std::endl;
+        printVector(vec);
     }
 }
 
-
-
 // Stubs for the sorting methods
+// This function is now much simpler. It's just the entry point.
 void PmergeMe::sortVector()
 {
-    std::vector<std::pair<int, int> > pairs;
-    std::vector<int> mainChain;
-    std::vector<int> pendulumChain;
-
     if (_vec.empty())
         throw std::runtime_error("Error: No input numbers provided.");
     if (_vec.size() == 1)
         return;
-    
-    initialPairing(pairs);
-    initialSort(pairs);
-    for (size_t i = 0; i < pairs.size(); i++)
-    {
-        mainChain.push_back(pairs[i].first);
-        pendulumChain.push_back(pairs[i].second);
-    }
-	
+    mergeInsertSort(_vec);
 }
 
 void PmergeMe::sortList()
 {
-	// Timing and sorting logic for list will go here
 }
