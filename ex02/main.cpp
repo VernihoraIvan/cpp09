@@ -13,6 +13,7 @@ int main(int argc, char** argv)
         std::cerr << "Usage: ./PmergeMe <sequence>" << std::endl;
         return 1;
     }
+    
     PmergeMe pmergeMe;
 
     try

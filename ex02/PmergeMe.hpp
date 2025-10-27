@@ -23,17 +23,13 @@ private:
 	PmergeMe(const PmergeMe &other);
 	PmergeMe &operator=(const PmergeMe &other);
 
-	// Private methods for vector
     void initialPairing(const std::vector<int> &vec, std::vector<std::pair<int, int> > &pairs);
 	void sortVector();
 	void initialSort(std::vector<std::pair<int, int> > &pairs);
 	void mergeInsertSort(std::vector<int> &vec);
-	// ... any other helper functions for vector ...
 
-	// Private methods for list
 	void sortList();
 	void mergeInsertSort(std::list<int> &list);
-	// ... any other helper functions for list ...
     void setVecTime(double time);
     void setListTime(double time);
 

@@ -5,7 +5,7 @@
 #define RED "\033[31m"
 #define GREEN "\033[32m"
 #define RESET "\033[0m"
-#define DEBUG false
+#define DEBUG true
 const int MAX_PRINT_COUNT = 50;
 
 PmergeMe::PmergeMe() : _vecTime(0.0), _listTime(0.0) {}
@@ -57,7 +57,6 @@ void printContainer(const std::vector<int> &vec)
 	std::cout << std::endl;
 }
 
-
 void PmergeMe::parseAndStore(int argc, char **argv)
 {
 	for (int i = 1; i < argc; ++i)
@@ -74,9 +73,9 @@ void PmergeMe::parseAndStore(int argc, char **argv)
 		_vec.push_back(static_cast<int>(num));
 		_list.push_back(static_cast<int>(num));
 	}
-	printContainer(_vec);
 	if (_vec.empty())
 		throw std::runtime_error("Error: No input numbers provided.");
+	printContainer(_vec);
 }
 
 void PmergeMe::executeSort()
@@ -143,9 +142,6 @@ void printPairs(const std::vector<std::pair<int, int> > &pairs)
 
 void PmergeMe::mergeInsertSort(std::vector<int> &vec)
 {
-	if (vec.size() <= 1)
-		return;
-
 	// Handle the stray element if the sequence size is odd.
 	int stray = -1;
 	if (vec.size() % 2 != 0)
@@ -197,16 +193,29 @@ void PmergeMe::mergeInsertSort(std::vector<int> &vec)
 	// Insert elements in groups based on the Jacobsthal sequence, working backwards.
 	// The jacob_indices vector now holds the boundaries for our insertion groups
 	int last_inserted_idx = 1;
+	if (DEBUG)
+	{
+		std::cout << BLUE << "mainChain: " << RESET << std::endl;
+		printContainer(mainChain);
+	}
 	for (size_t i = 0; i < jacob_indices.size(); ++i)
 	{
 		int group_end = jacob_indices[i];
 		for (int j = group_end; j > last_inserted_idx; --j)
 		{
 			int val = pendChain[j - 1];
+			// Searches for the first element in the partitioned range [first, last) which is not ordered before value
 			std::vector<int>::iterator insertion_point = std::lower_bound(mainChain.begin(), mainChain.end(), val);
+			if (DEBUG)
+				std::cout << GREEN << "val: " << val << " insertion_point: " << *insertion_point << RESET << std::endl;
 			mainChain.insert(insertion_point, val);
 		}
 		last_inserted_idx = group_end;
+	}
+	if (DEBUG)
+	{
+		std::cout << BLUE << "mainChain: " << RESET << std::endl;
+		printContainer(mainChain);
 	}
 
 	// Insert any remaining elements not covered by the Jacobsthal sequence
@@ -229,9 +238,6 @@ void PmergeMe::mergeInsertSort(std::vector<int> &vec)
 
 void PmergeMe::mergeInsertSort(std::list<int> &list)
 {
-    if (list.size() <= 1)
-        return;
-
     int stray = -1;
     if (list.size() % 2 != 0)
     {
