@@ -117,10 +117,6 @@ void PmergeMe::initialPairing(const std::vector<int> &vec, std::vector<std::pair
         else
             pairs.push_back(std::make_pair(vec[i], 0));
     }
-    // for (size_t i = 0; i < pairs.size(); i++)
-    // {
-    //     std::cout << BLUE << "pair[" << i << "]: " << pairs[i].first << " " << pairs[i].second << RESET << std::endl;
-    // }
 }
 
 void PmergeMe::initialSort(std::vector<std::pair<int, int> > &pairs)
@@ -130,10 +126,14 @@ void PmergeMe::initialSort(std::vector<std::pair<int, int> > &pairs)
         if (pairs[i].first > pairs[i].second)
             std::swap(pairs[i].first, pairs[i].second);
     }
-    // for (size_t i = 0; i < pairs.size(); i++)
-    // {
-    //     std::cout << BLUE << "pair[" << i << "]: " << pairs[i].first << " " << pairs[i].second << RESET << std::endl;
-    // }
+}
+
+void printPairs(const std::vector<std::pair<int, int> > &pairs)
+{
+	for (size_t i = 0; i < pairs.size(); i++)
+	{
+		std::cout << BLUE << "pair[" << i << "]: " << pairs[i].first << " " << pairs[i].second << RESET << std::endl;
+	}
 }
 
 void PmergeMe::mergeInsertSort(std::vector<int> &vec)
@@ -162,6 +162,8 @@ void PmergeMe::mergeInsertSort(std::vector<int> &vec)
 	// 3. Create the main chain (larger elements) and pendulum chain (smaller elements).
 	std::vector<int> mainChain;
 	std::vector<int> pendChain;
+
+	printPairs(pairs);
 	for (size_t i = 0; i < pairs.size(); i++)
 	{
 		mainChain.push_back(pairs[i].first);
@@ -181,15 +183,21 @@ void PmergeMe::mergeInsertSort(std::vector<int> &vec)
 
 	// Generate Jacobsthal numbers to determine the optimal insertion order.
 	std::vector<int> jacob_indices;
-	int j_prev = 1, j_curr = 3;
+	int j_prev = 1;
+	int j_curr = 3;
 	while (j_prev < (int)pendChain.size()) {
+		std::cout << RED << "j_prev: " << j_prev << " j_curr: " << j_curr << " pendChain.size(): " << pendChain.size() << RESET << std::endl;
 		jacob_indices.push_back(std::min((int)pendChain.size(), j_curr));
 		int temp = j_curr;
 		j_curr = j_curr + 2 * j_prev;
 		j_prev = temp;
+		std::cout << RED << "j_prev: " << j_prev << " j_curr: " << j_curr << " pendChain.size(): " << pendChain.size() << RESET << std::endl;
 	}
+	std::cout << BLUE << "jacob_indices: " << std::endl << RESET;
+	// printVector(jacob_indices);
 
 	// Insert elements in groups based on the Jacobsthal sequence, working backwards.
+	// The jacob_indices vector now holds the boundaries for our insertion groups
 	int last_inserted_idx = 1;
 	for (size_t i = 0; i < jacob_indices.size(); ++i)
 	{
@@ -220,8 +228,6 @@ void PmergeMe::mergeInsertSort(std::vector<int> &vec)
     }
 }
 
-// Stubs for the sorting methods
-// This function is now much simpler. It's just the entry point.
 void PmergeMe::sortVector()
 {
     if (_vec.empty())
