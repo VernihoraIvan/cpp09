@@ -11,6 +11,15 @@
 #include <sstream>
 #include <algorithm>
 #include <utility>
+#include <climits>
+
+
+#define BLUE "\033[34m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define RESET "\033[0m"
+#define DEBUG false
+#define MAX_PRINT_COUNT 50
 
 class PmergeMe
 {
@@ -23,15 +32,15 @@ private:
 	PmergeMe(const PmergeMe &other);
 	PmergeMe &operator=(const PmergeMe &other);
 
-    void initialPairing(const std::vector<int> &vec, std::vector<std::pair<int, int> > &pairs);
 	void sortVector();
-	void initialSort(std::vector<std::pair<int, int> > &pairs);
-	void mergeInsertSort(std::vector<int> &vec);
+	void mergeInsertSortVector(std::vector<int> &vec);
 
 	void sortList();
-	void mergeInsertSort(std::list<int> &list);
+	void mergeInsertSortList(std::list<int> &list);
+
     void setVecTime(double time);
     void setListTime(double time);
+	void printContainer(const std::vector<int> &vec);
 
 public:
 	PmergeMe();

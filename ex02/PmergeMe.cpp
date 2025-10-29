@@ -1,12 +1,4 @@
 #include "PmergeMe.hpp"
-#include <climits>
-
-#define BLUE "\033[34m"
-#define RED "\033[31m"
-#define GREEN "\033[32m"
-#define RESET "\033[0m"
-#define DEBUG true
-const int MAX_PRINT_COUNT = 50;
 
 PmergeMe::PmergeMe() : _vecTime(0.0), _listTime(0.0) {}
 
@@ -39,7 +31,7 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 	return *this;
 }
 
-void printContainer(const std::vector<int> &vec)
+void PmergeMe::printContainer(const std::vector<int> &vec)
 {
     if (DEBUG)
         std::cout << BLUE << "Before: " << RESET;
@@ -75,20 +67,21 @@ void PmergeMe::parseAndStore(int argc, char **argv)
 	}
 	if (_vec.empty())
 		throw std::runtime_error("Error: No input numbers provided.");
-	printContainer(_vec);
 }
 
 void PmergeMe::executeSort()
 {
-    clock_t start = clock();
-	sortVector();
-    clock_t vecEnd = clock();
-    setVecTime(static_cast<double>(vecEnd - start) / CLOCKS_PER_SEC * 1000000);
+	printContainer(_vec);
 
-    clock_t startList = clock();
+    clock_t start_vector = clock();
+	sortVector();
+    clock_t end_vector = clock();
+    setVecTime(static_cast<double>(end_vector - start_vector) / CLOCKS_PER_SEC * 1000000);
+
+    clock_t start_list = clock();
 	sortList();
-    clock_t listEnd = clock();
-    setListTime(static_cast<double>(listEnd - startList) / CLOCKS_PER_SEC * 1000000);
+    clock_t end_list = clock();
+    setListTime(static_cast<double>(end_list - start_list) / CLOCKS_PER_SEC * 1000000);
 }
 
 void PmergeMe::printResults()
@@ -112,36 +105,12 @@ void PmergeMe::printResults()
 			  << " us" << std::endl;
 }
 
-void PmergeMe::initialPairing(const std::vector<int> &vec, std::vector<std::pair<int, int> > &pairs)
+void PmergeMe::mergeInsertSortVector(std::vector<int> &vec)
 {
-    for (size_t i = 0; i < vec.size(); i += 2)
-    {
-        if (i + 1 < vec.size())
-            pairs.push_back(std::make_pair(vec[i], vec[i + 1]));
-        else
-            pairs.push_back(std::make_pair(vec[i], 0));
-    }
-}
+	// Recursion stop condition
+	if (vec.size() <= 1)
+		return;
 
-void PmergeMe::initialSort(std::vector<std::pair<int, int> > &pairs)
-{
-    for (size_t i = 0; i < pairs.size(); i++)
-    {
-        if (pairs[i].first > pairs[i].second)
-            std::swap(pairs[i].first, pairs[i].second);
-    }
-}
-
-void printPairs(const std::vector<std::pair<int, int> > &pairs)
-{
-	for (size_t i = 0; i < pairs.size(); i++)
-	{
-		std::cout << BLUE << "pair[" << i << "]: " << pairs[i].first << " " << pairs[i].second << RESET << std::endl;
-	}
-}
-
-void PmergeMe::mergeInsertSort(std::vector<int> &vec)
-{
 	// Handle the stray element if the sequence size is odd.
 	int stray = -1;
 	if (vec.size() % 2 != 0)
@@ -174,7 +143,7 @@ void PmergeMe::mergeInsertSort(std::vector<int> &vec)
 	}
 
 	// Recursively sort the main chain.
-	mergeInsertSort(mainChain);
+	mergeInsertSortVector(mainChain);
 
 	if (!pendChain.empty())
 		mainChain.insert(mainChain.begin(), pendChain[0]);
@@ -198,6 +167,7 @@ void PmergeMe::mergeInsertSort(std::vector<int> &vec)
 		std::cout << BLUE << "mainChain: " << RESET << std::endl;
 		printContainer(mainChain);
 	}
+	// Insert pendulum elements into the main chain using the Jacobsthal sequence.
 	for (size_t i = 0; i < jacob_indices.size(); ++i)
 	{
 		int group_end = jacob_indices[i];
@@ -236,8 +206,11 @@ void PmergeMe::mergeInsertSort(std::vector<int> &vec)
 	vec = mainChain;
 }
 
-void PmergeMe::mergeInsertSort(std::list<int> &list)
+void PmergeMe::mergeInsertSortList(std::list<int> &list)
 {
+    if (list.size() <= 1)
+        return;
+
     int stray = -1;
     if (list.size() % 2 != 0)
     {
@@ -266,7 +239,7 @@ void PmergeMe::mergeInsertSort(std::list<int> &list)
         pendChain.push_back(it->second);
     }
 
-    mergeInsertSort(mainChain);
+    mergeInsertSortList(mainChain);
 
     if (!pendChain.empty())
         mainChain.push_front(pendChain.front());
@@ -320,7 +293,7 @@ void PmergeMe::sortVector()
         throw std::runtime_error("Error: No input numbers provided.");
     if (_vec.size() == 1)
         return;
-    mergeInsertSort(_vec);
+    mergeInsertSortVector(_vec);
 }
 
 void PmergeMe::sortList()
@@ -329,5 +302,5 @@ void PmergeMe::sortList()
 		throw std::runtime_error("Error: No input numbers provided.");
 	if (_list.size() == 1)
 		return;
-	mergeInsertSort(_list);
+	mergeInsertSortList(_list);
 }
