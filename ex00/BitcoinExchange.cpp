@@ -51,10 +51,17 @@ void BitcoinExchange::_parseInputData(const std::string &inputFilename)
 {
     std::ifstream inputFile(inputFilename.c_str());
     std::string line;
+    std::string extension = inputFilename.substr(inputFilename.find_last_of(".") + 1);
 
     if (!inputFile.is_open())
     {
         std::cerr << RED << "Error: could not open inputFile " << inputFilename << RESET << std::endl;
+        return;
+    }
+
+    if (extension != "txt")
+    {
+        std::cerr << RED << "Error: unsupported file extension ." << extension << " for input file " << inputFilename << RESET << std::endl;
         return;
     }
 
@@ -90,8 +97,8 @@ void BitcoinExchange::_parseInputData(const std::string &inputFilename)
         if (rate == -1)
             continue;
 
-        _outputData[date] = std::stod(value) * rate;
-        std::cout << date << " => " << std::stod(value) << " = " << _outputData[date] << std::endl;
+    _outputData[date] = parseDouble(value) * rate;
+    std::cout << date << " => " << parseDouble(value) << " = " << _outputData[date] << std::endl;
     }
 }
 
@@ -128,12 +135,12 @@ void BitcoinExchange::_loadDBData(const std::string &dbFilename)
             continue;
         }
 
-        if (isValueInvalid(value))
+        if (isValueInvalid(value, false))
         {
             std::cerr << RED << "Error: invalid value " << value << RESET << std::endl;
             continue;
         }
 
-        _data[date] = std::stod(value);
+    _data[date] = parseDouble(value);
     }
 }

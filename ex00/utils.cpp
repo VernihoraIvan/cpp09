@@ -1,8 +1,11 @@
+#include "utils.hpp"
 #include <string>
 #include <cstddef>
 #include <sstream>
 #include <iostream>
 #include <ctime>
+#include <cstdlib>
+#include <cerrno>
 
 std::string trim(const std::string& str) {
     size_t first = str.find_first_not_of(" \t\n\r");
@@ -22,24 +25,24 @@ int isDateInvalid(const std::string& date) {
     ss >> year >> dash >> month >> dash >> day;
 
     struct tm timeinfo = {};
-    timeinfo.tm_year = year - 1900; 
-    timeinfo.tm_mon = month - 1;     
+    timeinfo.tm_year = year - 1900;
+    timeinfo.tm_mon = month - 1;
     timeinfo.tm_mday = day;
     timeinfo.tm_hour = 0;
     timeinfo.tm_min = 0;
     timeinfo.tm_sec = 0;
     timeinfo.tm_isdst = -1;
-    
+
     if (timeinfo.tm_mon < 0 || timeinfo.tm_mon > 11)
         return 1;
     if (timeinfo.tm_mday < 1 || timeinfo.tm_mday > 31)
         return 1;
     if (timeinfo.tm_year < 0)
         return 1;
-    
+
     time_t timestamp = mktime(&timeinfo);
 
-    std::time_t now = std::time(nullptr); 
+    std::time_t now = std::time(NULL);
 
 
     if (timestamp == -1 || timestamp > now)
@@ -48,11 +51,24 @@ int isDateInvalid(const std::string& date) {
     return ss.fail();
 }
 
-int isValueInvalid(const std::string& value, bool isInput = false)
+int isValueInvalid(const std::string& value, bool isInput)
 {
     if (value.find_first_not_of("0123456789.") != std::string::npos)
         return 1;
-    if (isInput && (std::stod(value) < 0 || std::stod(value) > 1000))
+    double parsed = 0.0;
+    std::stringstream sstream(value);
+    // make a stream from the text, try to parse a number from it, and if that fails, reject the input
+    if (!(sstream >> parsed))
+        return 1;
+    if (isInput && (parsed < VALUE_MIN || parsed > VALUE_MAX))
         return 1;
     return 0;
+}
+
+double parseDouble(const std::string& s)
+{
+    double val = 0.0;
+    std::stringstream ss(s);
+    ss >> val;
+    return val;
 }
